@@ -2,3 +2,6 @@ cryptofuzz
 colorthon
 hdwallet
 requests
+bit
+bip32utils
+mnemonic
